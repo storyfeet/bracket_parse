@@ -1,0 +1,6 @@
+[package]
+name = "bracket_parse"
+version = "0.1.0"
+authors = ["storyfeet <thebeaky@psmail.net>"]
+
+[dependencies]
