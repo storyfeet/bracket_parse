@@ -1,9 +1,12 @@
 [package]
 name = "bracket_parse"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["storyfeet <thebeaky@psmail.net>"]
 description = "simple parser for bracketed lists with quoted and unquoted strings"
 license = "MIT"
 repository = "https://github.com/storyfeet/bracket_parse"
+
+keywords = ["bracket","parse","tree"]
+categories = ["parsing"]
 
 [dependencies]

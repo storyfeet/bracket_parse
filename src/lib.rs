@@ -48,13 +48,14 @@
 //! assert_eq!(bk,chn);
 //!
 //! ```
-//!
-//!
-//! 
-
 
 
 use std::str::FromStr;
+
+pub mod tail;
+pub use tail::{Tail};
+use tail::EMPTY_BRACKET;
+
 
 #[derive(PartialEq,Debug)]
 pub enum Bracket{
@@ -198,6 +199,38 @@ impl Bracket{
         }
         Err(format!("Close Delim '{}' not found",delim))
     }
+
+    pub fn head<'a>(&'a self)->&'a Bracket{
+        match self{
+            Bracket::Branch(v)=>match v.len(){
+                0 => &EMPTY_BRACKET,
+                _ => &v[0], 
+            }
+            _ => &EMPTY_BRACKET,
+        }
+    }
+
+    pub fn tail<'a>(&'a self)->Tail<'a>{
+        match self{
+            Bracket::Branch(v)=>match v.len(){
+                0|1 =>Tail::Empty,
+                _=>Tail::Rest(&v[1..]),
+            }
+            _=>Tail::Empty,
+        }
+    }
+
+    pub fn head_tail<'a>(&'a self)->(&'a Bracket,Tail<'a>){
+        (self.head(),self.tail())
+    }
+
+    pub fn match_str<'a>(&'a self)->&'a str{
+        match self {
+            Bracket::Leaf(ref s)=>s.as_ref(),
+            _=>"",
+        }
+    }
+
 }
 
 
@@ -260,5 +293,16 @@ mod tests {
     fn errors(){
         assert!(Bracket::from_str("peop ( er").is_err());
         assert!(Bracket::from_str(r#""poop"#).is_err());
+    }
+
+    #[test]
+    fn test_head_tail(){
+        
+        let b1 = Bracket::from_str("hello (andy dave)").unwrap();
+        match b1.head().match_str(){
+            "hello"=>{},//Where the actual code might go
+            _=>panic!("Head is not hello leaf"),
+            
+        }
     }
 }
