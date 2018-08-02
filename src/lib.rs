@@ -1,3 +1,59 @@
+//! # Bracket Parse
+//!
+//! A Utility for parsing Bracketed lists and sets of strings.
+//!
+//! It is a relatively lazy way of parsing items from a bracketed string,
+//! 
+//! "hello(peter,dave)" is easy for it to handle, as are nested brackets.
+//!
+//! The above will result in something like 
+//!
+//! >Branch[Leaf("hello"),Branch[Leaf("peter"),Leaf("dave")]]
+//! 
+//! This is not intended super extensible right now, 
+//! though contributions are welcome.
+//!
+//! The list can also be constructed relatively simply by
+//! using chained builder type methods
+//!
+//! ```
+//! use bracket_parse::{Bracket,br};
+//! use bracket_parse::Bracket::{Leaf,Branch};
+//! use std::str::FromStr;
+//!
+//! let str1 = Bracket::from_str("hello(peter,dave)").unwrap();
+//!
+//! //Standard Build method
+//! let basic1 = Branch(vec![Leaf("hello".to_string()),
+//!                         Branch(vec![Leaf("peter".to_string()),
+//!                                     Leaf("dave".to_string())])]);
+//!
+//! //Chaining Build method
+//! let chain1 = br().sib_lf("hello")
+//!                    .sib(br().sib_lf("peter").sib_lf("dave"));
+//! 
+//! assert_eq!(str1,basic1);
+//! assert_eq!(str1,chain1);
+//! ```
+//!
+//! It can also handle string input with escapes. Quotes are removed and the string item is
+//! considered a single Leaf value;
+//!
+//! ```
+//! use bracket_parse::{Bracket,br,lf};
+//! use std::str::FromStr;
+//! 
+//! let bk = Bracket::from_str(r#""hello" 'matt"' "and \"friends\"""#).unwrap();
+//! let chn = br().sib_lf("hello").sib_lf("matt\"").sib_lf("and \"friends\"");
+//! assert_eq!(bk,chn);
+//!
+//! ```
+//!
+//!
+//! 
+
+
+
 use std::str::FromStr;
 
 #[derive(PartialEq,Debug)]
@@ -50,7 +106,7 @@ impl Bracket{
     }
 
     /// chainging method for easily adding a leaf as a sibling from an &str 
-    pub fn sibs(self,s:&str)->Self{
+    pub fn sib_lf(self,s:&str)->Self{
         self.sib(lf(s))
     }
 
@@ -155,8 +211,8 @@ mod tests {
     #[test]
     fn spaces() {
         let b1 = Bracket::from_str("matt dave (andy steve)").unwrap();
-        let c1 = br().sibs("matt").sibs("dave").sib(
-                            br().sibs("andy").sibs("steve")
+        let c1 = br().sib_lf("matt").sib_lf("dave").sib(
+                            br().sib_lf("andy").sib_lf("steve")
                         );
                                         
         let b2 = Bracket::from_str("matt dave( andy steve)").unwrap();
@@ -169,7 +225,7 @@ mod tests {
     #[test]
     fn empty_parent(){
         let b1 = Bracket::from_str("matt () dave").unwrap();
-        let c1 = br().sibs("matt").sib(br()).sibs("dave");
+        let c1 = br().sib_lf("matt").sib(br()).sib_lf("dave");
         assert_eq!(b1,c1);
     }
 
@@ -191,7 +247,7 @@ mod tests {
     #[test]
     fn strings(){
         let b1 = Bracket::from_str(r#"matt"dave""#).unwrap();
-        let c1 = br().sibs("matt").sibs("dave");
+        let c1 = br().sib_lf("matt").sib_lf("dave");
 
         assert_eq!(b1,c1);
 
