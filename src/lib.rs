@@ -53,13 +53,14 @@
 use std::str::FromStr;
 use std::fmt;
 use std::fmt::Display;
+use std::iter::IntoIterator;
 
 pub mod tail;
 pub use tail::{Tail};
 use tail::EMPTY_BRACKET;
 
-//pub mod iter;
-//pub use iter::BracketIter;
+pub mod iter;
+pub use iter::*;
 
 
 #[derive(PartialEq,Debug)]
@@ -93,6 +94,14 @@ impl FromStr for Bracket{
             res.add_sib_str(curr);
         }
         Ok(res)
+    }
+}
+
+impl<'a>IntoIterator for &'a Bracket{
+    type Item = &'a Bracket;
+    type IntoIter = BracketIter<'a>;
+    fn into_iter(self)->Self::IntoIter{
+        BracketIter::new(self)
     }
 }
 

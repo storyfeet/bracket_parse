@@ -1,6 +1,6 @@
 [package]
 name = "bracket_parse"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["storyfeet <thebeaky@psmail.net>"]
 description = "simple parser for bracketed lists with quoted and unquoted strings"
 license = "MIT"
