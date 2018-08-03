@@ -51,10 +51,15 @@
 
 
 use std::str::FromStr;
+use std::fmt;
+use std::fmt::Display;
 
 pub mod tail;
 pub use tail::{Tail};
 use tail::EMPTY_BRACKET;
+
+//pub mod iter;
+//pub use iter::BracketIter;
 
 
 #[derive(PartialEq,Debug)]
@@ -220,6 +225,30 @@ impl Bracket{
         }
     }
 
+    pub fn tail_n<'a>(&'a self,n:usize)->Tail<'a>{
+        match self{
+            Bracket::Branch(v)=>{
+                if v.len() <= n {
+                    return Tail::Empty;
+                }
+                Tail::Rest(&v[n..])
+            }
+            _=>Tail::Empty,
+        }
+    }
+
+    pub fn tail_h<'a>(&'a self, n:usize)->&'a Bracket{
+        match self{
+            Bracket::Branch(v)=>{
+                if v.len() <= n{
+                    return &EMPTY_BRACKET;
+                }
+                &v[n]
+            }
+            _=>&EMPTY_BRACKET,
+        }
+    }
+
     pub fn head_tail<'a>(&'a self)->(&'a Bracket,Tail<'a>){
         (self.head(),self.tail())
     }
@@ -233,7 +262,32 @@ impl Bracket{
 
 }
 
+impl Display for Bracket {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Bracket::Branch(ref v)=>{
+                let mut gap = "";
+                for b in v {
+                    let res = match b {
+                        Bracket::Branch(_)=>write!(f,"{}[{}]",gap,b),
+                        _=>write!(f,"{}{}",gap,b),
+                    };
+                    if res.is_err(){
+                        return res;
+                    }
+                    gap = " ";
+                }
+                Ok(())
+            },
+            Bracket::Leaf(s)=>{
+                //TODO handle Escapes
+                write!(f,"\"{}\"",s)
+            },
+            _=>{ write!(f,"--EMPTY--") },
+        }
+    }
 
+}
 
 
 
@@ -304,5 +358,27 @@ mod tests {
             _=>panic!("Head is not hello leaf"),
             
         }
+    }
+
+    #[test]
+    fn many_tails(){
+        let pb = br().sib_lf("matt").sib_lf("dave").sib_lf("pete").sib_lf("andy");
+
+        let t1 = pb.tail(); //pb is parent bracket, t1 is tail
+        let t4 = t1.tail_h(2).match_str();
+        assert_eq!(t4,"andy");
+
+        let th1 = pb.tail_h(3).match_str();
+
+        assert_eq!(t4,th1);
+        
+    }
+
+    #[test]
+    fn test_to_string(){
+        let br = Bracket::from_str("matt dave( andy steve)").unwrap();
+        let bs = br.to_string();
+
+        assert_eq!(&bs,r#""matt" "dave" ["andy" "steve"]"#);
     }
 }

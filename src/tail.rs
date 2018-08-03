@@ -25,11 +25,38 @@ impl<'a> Tail<'a>{
         match self{
             Tail::Rest(v)=>match v.len(){
                 0|1=>Tail::Empty,
-                _=>Tail::Rest(&v[1..]),
+                _=> Tail::Rest(&v[1..]),
             },
             Tail::Empty=>Tail::Empty,
         }
     }
+
+    pub fn tail_n(&'a self,n:usize)->Tail<'a>{
+        match self{
+            Tail::Rest(v)=>{
+                if v.len() <= n{
+                    return Tail::Empty;
+                }
+                Tail::Rest(&v[n..])
+            },
+            Tail::Empty=>Tail::Empty,
+        }
+    }
+
+    pub fn tail_h(&'a self,n:usize)->&'a Bracket{
+        match self{
+            Tail::Rest(v)=>{
+                if v.len() <= n{
+                    return &EMPTY_BRACKET;
+                }
+                &v[n]
+            },
+            Tail::Empty=>&EMPTY_BRACKET,
+        }
+        
+    }
+    
+
     pub fn head_tail(&'a self)->(&'a Bracket,Tail<'a>){
         (self.head(),self.tail()) 
     }
@@ -47,4 +74,6 @@ impl<'a> IntoIterator for Tail<'a>{
         }
     }
 }
+
+
 
