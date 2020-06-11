@@ -1,8 +1,8 @@
 [package]
 name = "bracket_parse"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["storyfeet <thebeaky@psmail.net>"]
-description = "simple parser for bracketed lists with quoted and unquoted strings"
+description = "simple parser for bracketed lists with quoted and unquoted strings -- Now deprecated, favouring Gobble instead which can do everything this does much tidier"
 license = "MIT"
 repository = "https://github.com/storyfeet/bracket_parse"
 
