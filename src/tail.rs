@@ -68,8 +68,8 @@ impl<'a> IntoIterator for Tail<'a>{
     type IntoIter = ::std::slice::Iter<'a,Bracket>;
     fn into_iter(self)->Self::IntoIter{
         match self {
-            Tail::Rest(v)=>v.into_iter(),
-            _=>EMPTY_B_SLICE.into_iter(),
+            Tail::Rest(v)=>v.iter(),
+            _=>EMPTY_B_SLICE.iter(),
                   
         }
     }
